@@ -1,0 +1,57 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ordersdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+app:
+  product-service:
+    base-url: ${PRODUCT_SERVICE_URL:http://localhost:8081}
+  rabbitmq:
+    exchange: ${ORDERS_EXCHANGE:orders.exchange}
+    queues:
+      created: ${ORDERS_CREATED_QUEUE:orders.created.queue}
+      cancelled: ${ORDERS_CANCELLED_QUEUE:orders.cancelled.queue}
+    routing:
+      created: ${ORDER_CREATED_ROUTING_KEY:order.created}
+      cancelled: ${ORDER_CANCELLED_ROUTING_KEY:order.cancelled}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  health:
+    rabbit:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: order-service
+    version: 1.0.0
